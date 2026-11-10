@@ -8,6 +8,9 @@ export default function MyDogs({ user }) {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
     const [dogs, setDogs] = useState([]);
+  const [selectedDogId, setSelectedDogId] = useState(null);
+  const [dogMenuOpen, setDogMenuOpen] = useState(false);
+
       const [name, setName] = useState('');
   const [sex, setSex] = useState('');
   const [breed, setBreed] = useState('');
@@ -124,9 +127,55 @@ export default function MyDogs({ user }) {
                                                                                                                                                                                                                                                 </form>
                                                                                                                                                                                                                                                       )}
 
-                                                                                                                                                                                                                                                            {dogs.map((dog) => (
+                                                                                                                                                                                                                                                            
+      <div style={{position:'relative', maxWidth:380, margin:'16px 0'}}>
+        <button type="button"
+          onClick={() => setDogMenuOpen(!dogMenuOpen)}
+          style={{width:'100%', padding:12, borderRadius:10,
+            background:'white', border:'1px solid #aaa',
+            textAlign:'left', cursor:'pointer'}}>
+          🐾 {dogs.find(d => d.id === selectedDogId)?.name || 'Select a Dog'} ▾
+        </button>
+        {dogMenuOpen && (
+          <div style={{background:'white', border:'1px solid #ddd',
+            borderRadius:10, marginTop:4, padding:6}}>
+            {dogs.map(dog => {
+              const photo = dog.photoUrl || dog.photoURL ||
+                dog.profilePhotoUrl || dog.profilePhoto;
+              return (
+                <button key={dog.id} type="button"
+                  onClick={() => {
+                    setSelectedDogId(dog.id);
+                    setDogMenuOpen(false);
+                  }}
+                  style={{display:'flex', alignItems:'center',
+                    gap:12, padding:10, width:'100%',
+                    background:'white', border:0,
+                    textAlign:'left', cursor:'pointer'}}>
+                  {typeof photo === 'string' && photo ? (
+                    <img src={photo} alt=""
+                      style={{width:32,height:32,borderRadius:'50%',
+                        objectFit:'cover'}} />
+                  ) : (
+                    <span style={{width:32,height:32,borderRadius:'50%',
+                      background:'#e8eee8',display:'grid',
+                      placeItems:'center'}}>🐾</span>
+                  )}
+                  {dog.name}
+                </button>
+              );
+            })}
+            <button type="button" onClick={() => {
+              setDogMenuOpen(false);
+              newDog();
+            }}>+ Add New Dog</button>
+          </div>
+        )}
+      </div>
+      {!selectedDogId && <p>Select a dog to view their profile.</p>}
+{dogs.filter((dog) => dog.id === selectedDogId).map((dog) => (
                                                                                                                                                                                                                                                                     <div key={dog.id} style={{padding: 12, marginBottom: 12, border: '1px solid #ccc', borderRadius: 10}}>
-  <details>
+  <details open>
     <summary style={{cursor: 'pointer', fontWeight: 'bold'}}>
       🐾 {dog.name}
     </summary>
